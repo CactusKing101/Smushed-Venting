@@ -28,13 +28,6 @@ async function vent(member, chId, chType, iId, iToken, vent) {
     ventCh.fetchWebhooks().then(async hooks => {
       if (hooks == null) return reply(iId, iToken, 'Error:\nNo webhooks found!');
       const webhook = hooks.first();
-      if (chId == config['tw-ch']) {
-        webhook.token = token['tw-ch'];
-        webhook.url += token['tw-ch'];
-      } else {
-        webhook.token = token['vent-ch'];
-        webhook.url += token['vent-ch'];
-      }
 
       main.push([++id, `${member.user.username}#${member.user.discriminator}`, member.user.id]);
       var embeds = [];
