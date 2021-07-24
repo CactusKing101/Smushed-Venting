@@ -48,35 +48,20 @@ async function vent(member, chId, chType, iId, iToken, vent) {
   }
 };
 
-async function deleteVent(tw, iId, iToken, id) {
+async function deleteVent(iId, iToken, id) {
   try {
-    if (tw) {
-      var yes = true;
-      const messages = await client.channels.cache.get(config['tw-ch']).messages.fetch({ limit: 20 })
-      messages.forEach(async (msg) => {
-        var ventId = msg.content.split(' ');
-        if (msg.webhookID != null && ventId[2] == id && yes) {
-          const message = await client.channels.cache.get(config['tw-ch']).messages.fetch(msg.id)
-          message.delete();
-          client.channels.cache.get(config['log-ch']).send(`Deleted vent id ${id}`)
-          !yes;
-        } 
-      });
-      reply(iId, iToken, `The vent was deleted\nIf you believe this is an actually an error contact a mod with a screenshot`);
-    } else {
-      var yes = true;
-      const messages = await client.channels.cache.get(config['vent-ch']).messages.fetch({ limit: 20 })
-      messages.forEach(async (msg) => {
-        var ventId = msg.content.split(' ');
-        if (msg.webhookID != null && ventId[2] == id && yes) {
-          const message = await client.channels.cache.get(config['vent-ch']).messages.fetch(msg.id)
-          message.delete();
-          client.channels.cache.get(config['log-ch']).send(`Deleted vent id ${id}`)
-          !yes;
-        } 
-      });
-      reply(iId, iToken, `The vent was deleted\nIf you believe this is an actually an error contact a mod with a screenshot`);
-    }
+    var yes = true;
+    const messages = await client.channels.cache.get(config['vent-ch']).messages.fetch({ limit: 20 })
+    messages.forEach(async (msg) => {
+      var ventId = msg.content.split(' ');
+      if (msg.webhookID != null && ventId[2] == id && yes) {
+        const message = await client.channels.cache.get(config['vent-ch']).messages.fetch(msg.id)
+        message.delete();
+        client.channels.cache.get(config['log-ch']).send(`Deleted vent id ${id}`)
+        !yes;
+      } 
+    });
+    reply(iId, iToken, `The vent was deleted\nIf you believe this is an actually an error contact a mod with a screenshot`);
   } catch (err) {
     console.warn(err);
   }
@@ -89,12 +74,6 @@ client.once('ready', () => {
     name: 'vent',
     description: 'Sends an anonymous vent the venting channel',
     options: [
-      {
-        name: 'tw',
-        type: 5,
-        description: 'Whether or not the vent contains triggers',
-        required: true,
-      },
       {
         name: 'vent',
         type: 3,
@@ -113,35 +92,16 @@ client.once('ready', () => {
         description: 'Id to the vent you have sent',
         required: true,
       },
-      {
-        name: 'tw',
-        type: 5,
-        description: 'Was this vent in the trigger warning channel?',
-        required: true,
-      },
     ],
   }});
 });
 
 client.ws.on('INTERACTION_CREATE', async interaction => {
   if (interaction.data.name == 'vent') {
-    let banned = false;
-    for (let i = 0; i < config.banned.length; ++i) {
-      if (config.banned[i] == interaction.member.user.id) {
-        banned = true;
-        break;
-      }
-    }
-  
-    if (banned) return reply(interaction.id, interaction.token, 'Sorry you have been **banned** from using this bot. If you think this is a mistake or want to appeal, contact CatusKing#2624. Depression and suicide is not a joke and if you feel you need help please call a suicide hotline.\nhttps://www.opencounseling.com/suicide-hotlines');
-    if (interaction.data.options[0].value) {
-      vent(interaction.member, config['tw-ch'], 'trigger warning ', interaction.id, interaction.token, interaction.data.options[1].value);
-    } else {
-      vent(interaction.member, config['vent-ch'], '', interaction.id, interaction.token, interaction.data.options[1].value);
-    }
+    vent(interaction.member, config['vent-ch'], '', interaction.id, interaction.token, interaction.data.options[0].value);
   } else if (interaction.data.name == 'delete') {
     if (data.main[interaction.data.options[0].value - 1][2] == interaction.member.user.id) {
-      deleteVent(interaction.data.options[1].value, interaction.id, interaction.token, interaction.data.options[0].value);
+      deleteVent(interaction.id, interaction.token, interaction.data.options[0].value);
     } else {
       reply(interaction.id, interaction.token, `This isn't your vent according to the database\nContact CatusKing#2624 if you believe this an actual error`);
     }
@@ -151,7 +111,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 client.on('message', (msg) => {
   if (msg.author.bot || msg.webhookID) return;
 
-  if (msg.channel.id == config['tw-ch'] || msg.channel.id == config['vent-ch']) {
+  if (msg.channel.id == config['vent-ch']) {
     if (msg.reference != null) {
       client.channels.cache.get(msg.reference.channelID).messages.fetch(msg.reference.messageID)
         .then(message => {
