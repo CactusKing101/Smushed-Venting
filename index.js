@@ -26,6 +26,7 @@ async function vent(member, chId, chType, iId, iToken, vent) {
   const ventCh = client.channels.cache.get(chId);
   try {
     ventCh.fetchWebhooks().then(async hooks => {
+      console.log(hooks);
       if (hooks == null) return reply(iId, iToken, 'Error:\nNo webhooks found!');
       const webhook = hooks[1];
 
