@@ -27,7 +27,7 @@ async function vent(member, chId, chType, iId, iToken, vent) {
   try {
     ventCh.fetchWebhooks().then(async hooks => {
       if (hooks == null) return reply(iId, iToken, 'Error:\nNo webhooks found!');
-      const webhook = hooks.first();
+      const webhook = hooks[1];
 
       main.push([++id, `${member.user.username}#${member.user.discriminator}`, member.user.id]);
       var embeds = [];
