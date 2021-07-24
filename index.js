@@ -3,8 +3,8 @@ const db = require('quick.db');
 const token = require('./general/token.json');
 const config = require('./general/config.json');
 const client = new Discord.Client();
-var main = db.get('main');
-var id = db.get('id');
+var main = db.get('main') || [];
+var id = db.get('id') || 0;
 
 function dm(targetId = String, description = String, color = String) {
   const ch = client.users.cache.get(targetId);
@@ -25,23 +25,24 @@ function reply(id, token, cont) {
 async function vent(member, chId, chType, iId, iToken, vent) {
   const ventCh = client.channels.cache.get(chId);
   try {
-    const webhooks = await ventCh.fetchWebhooks();
-    const webhook = webhooks.first();
+    ventCh.fetchWebhooks().then(async hooks => {
+      const webhook = hooks.first();
 
-    if (webhook == null) return reply(iId, iToken, 'Error:\nNo webhooks found!');
-    main.push([++id, `${member.user.username}#${member.user.discriminator}`, member.user.id]);
-    var embeds = [];
-    embeds.push(new Discord.MessageEmbed().setDescription(vent).setColor('#4995a3').setFooter(`Id: ${id}`));
-    await webhook.send(`[Venting] Id: ${id}`, {
-      username: 'Anonymous Venter',
-      avatarURL: client.user.displayAvatarURL(),
-      embeds: embeds,
+      if (webhook == null) return reply(iId, iToken, 'Error:\nNo webhooks found!');
+      main.push([++id, `${member.user.username}#${member.user.discriminator}`, member.user.id]);
+      var embeds = [];
+      embeds.push(new Discord.MessageEmbed().setDescription(vent).setColor('#4995a3').setFooter(`Id: ${id}`));
+      webhook.send(`[Venting] Id: ${id}`, {
+        username: 'Anonymous Venter',
+        avatarURL: client.user.displayAvatarURL(),
+        embeds: embeds,
+      });
+      reply(iId, iToken, `Your message has been sent to the ${chType}venting channel. Your life is important. We all care very deeply about you. Please know we are all here for you.\n*Keep in mind you can always delete a message you sent by doing /delete*`);
+      db.set('main', main);
+      db.set('id', id);
+      client.channels.cache.get(config['log-ch']).send(`${id}: ||${member.user.username}#${member.user.discriminator}(${member.user.id})||`);
+      console.log(id);
     });
-    reply(iId, iToken, `Your message has been sent to the ${chType}venting channel. Your life is important. We all care very deeply about you. Please know we are all here for you.\n*Keep in mind you can always delete a message you sent by doing /delete*`);
-    db.set('main', main);
-    db.set('id', id);
-    client.channels.cache.get(config['log-ch']).send(`${id}: ${member.user.username}#${member.user.discriminator}(${member.user.id})`);
-    console.log(id);
   } catch (error) {
     console.warn(error);
   }
@@ -134,9 +135,9 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
   
     if (banned) return reply(interaction.id, interaction.token, 'Sorry you have been **banned** from using this bot. If you think this is a mistake or want to appeal, contact CatusKing#2624. Depression and suicide is not a joke and if you feel you need help please call a suicide hotline.\nhttps://www.opencounseling.com/suicide-hotlines');
     if (interaction.data.options[0].value) {
-      vent(interaction.member, '834546271356321822', 'trigger warning ', interaction.id, interaction.token, interaction.data.options[1].value);
+      vent(interaction.member, config['tw-ch'], 'trigger warning ', interaction.id, interaction.token, interaction.data.options[1].value);
     } else {
-      vent(interaction.member, '833730808686575626', '', interaction.id, interaction.token, interaction.data.options[1].value);
+      vent(interaction.member, config['vent-ch'], '', interaction.id, interaction.token, interaction.data.options[1].value);
     }
   } else if (interaction.data.name == 'delete') {
     if (data.main[interaction.data.options[0].value - 1][2] == interaction.member.user.id) {
