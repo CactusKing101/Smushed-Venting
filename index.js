@@ -26,9 +26,11 @@ async function vent(member, chId, chType, iId, iToken, vent) {
   const ventCh = client.channels.cache.get(chId);
   try {
     ventCh.fetchWebhooks().then(async hooks => {
+      if (hooks == null) return reply(iId, iToken, 'Error:\nNo webhooks found!');
       const webhook = hooks.first();
+      console.log(webhook.token);
+      console.log(webhook.id);
 
-      if (webhook == null) return reply(iId, iToken, 'Error:\nNo webhooks found!');
       main.push([++id, `${member.user.username}#${member.user.discriminator}`, member.user.id]);
       var embeds = [];
       embeds.push(new Discord.MessageEmbed().setDescription(vent).setColor('#4995a3').setFooter(`Id: ${id}`));
@@ -157,7 +159,7 @@ client.on('message', (msg) => {
         .then(message => {
           if (message.webhookID != null) {
             const id = Number(message.content.split(' ')[2]);
-            dm(main[id - 1][2], `This is an automated message to alert you someone replied to your vent with the id ${id}\n\nAuthor: ${msg.author.tag}\n${msg.content}\n\n**This has no way to be tracked back to you unless you request your vent to be deleted or it is investigated.**`, '#9e9d9d')  
+            dm(main[id - 1][2], `This is an automated message to alert you someone replied to your vent with the id ${id}\n\nAuthor: ${msg.author.tag}\n${msg.content}\n\n**This has no way to be tracked back to you unless your vent is investigated.**`, '#9e9d9d')  
           }
         });
     }
