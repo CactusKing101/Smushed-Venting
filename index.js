@@ -102,7 +102,7 @@ client.once('ready', () => {
       },
     ],
   }});
-  client.api.applications(client.user.id).guilds('830495072876494879').commands.post({data: {
+  client.api.applications(client.user.id).guilds('821929481681502238').commands.post({data: {
     name: 'delete',
     description: 'Delete a vent you have sent',
     options: [
