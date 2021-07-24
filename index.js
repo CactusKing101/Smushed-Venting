@@ -100,7 +100,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
   if (interaction.data.name == 'vent') {
     vent(interaction.member, config['vent-ch'], '', interaction.id, interaction.token, interaction.data.options[0].value);
   } else if (interaction.data.name == 'delete') {
-    if (data.main[interaction.data.options[0].value - 1][2] == interaction.member.user.id) {
+    if (main[interaction.data.options[0].value - 1][2] == interaction.member.user.id) {
       deleteVent(interaction.id, interaction.token, interaction.data.options[0].value);
     } else {
       reply(interaction.id, interaction.token, `This isn't your vent according to the database\nContact CatusKing#2624 if you believe this an actual error`);
