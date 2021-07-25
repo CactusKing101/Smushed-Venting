@@ -9,7 +9,11 @@ var id = db.get('id') || 0;
 function dm(targetId = String, description = String, color = String) {
   const ch = client.users.cache.get(targetId);
   var embed = new Discord.MessageEmbed().setDescription(description).setColor(color);
-  ch.send(embed);
+  try {
+    ch.send(embed);
+  } catch (err) {
+    console.warn(err)
+  }
 };
 
 function reply(id, token, cont) {
