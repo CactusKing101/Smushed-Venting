@@ -114,7 +114,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
       reply(interaction.id, interaction.token, `This isn't your vent according to the database\nContact CatusKing#2624 if you believe this an actual error`);
     }
   } else if (interaction.data.name == 'info') {
-    reply(interaction.id, interaction.token, '**How it works**\n\nVents:\n - User uses /vent\n - Bot logs and stores the users vent id with their user id(but **not** their vent) into the database\n - Vent is sent into the channel using a webhook\n\nDelete:\n - User uses /delete\n - Bot checks to make sure the vent was created by that user using the database and vent id\n\n\nCreator: CatusKing#2624\nCreated: <t:1627112521:R>(7/24/2021)')
+    reply(interaction.id, interaction.token, '**How it works**\n\nVents:\n - User uses /vent\n - Bot logs and stores the users vent id with their user id(but **not** their vent) into the database\n - Vent is sent into the channel using a webhook\n\nDelete:\n - User uses /delete\n - Bot checks to make sure the vent was created by that user using the database and vent id\n\n\nCreator: <@473110112844644372>(CatusKing#2624)\nCreated: <t:1627112521:R>(7/24/2021)\nIf you would like a custom bot contact me at any time :D')
   }
 });
 
