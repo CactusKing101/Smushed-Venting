@@ -9,7 +9,11 @@ var id = db.get('id') || 0;
 function dm(targetId = String, description = String, color = String) {
   const ch = client.users.cache.get(targetId);
   var embed = new Discord.MessageEmbed().setDescription(description).setColor(color);
-  ch.send(embed);
+  try {
+    ch.send(embed);
+  } catch (err) {
+    console.warn(err)
+  }
 };
 
 function reply(id, token, cont) {
@@ -22,7 +26,7 @@ function reply(id, token, cont) {
   }});
 };
 
-async function vent(member, chId, chType, iId, iToken, vent) {
+async function vent(member, chId, iId, iToken, vent) {
   const ventCh = client.channels.cache.get(chId);
   try {
     ventCh.fetchWebhooks().then(async hooks => {
@@ -37,7 +41,7 @@ async function vent(member, chId, chType, iId, iToken, vent) {
         avatarURL: client.user.displayAvatarURL(),
         embeds: embeds,
       });
-      reply(iId, iToken, `Your message has been sent to the ${chType}venting channel. Your life is important. We all care very deeply about you. Please know we are all here for you.\n*Keep in mind you can always delete a message you sent by doing /delete*`);
+      reply(iId, iToken, `Your message has been sent to the venting channel. Please know we are all here for you <3\n*Keep in mind you can always delete a message you sent by doing /delete followed by the id of your vent.*`);
       db.set('main', main);
       db.set('id', id);
       client.channels.cache.get(config['log-ch']).send(`${id}: ||${member.user.username}#${member.user.discriminator}(${member.user.id})||`);
@@ -102,7 +106,7 @@ client.once('ready', () => {
 
 client.ws.on('INTERACTION_CREATE', async interaction => {
   if (interaction.data.name == 'vent') {
-    vent(interaction.member, config['vent-ch'], '', interaction.id, interaction.token, interaction.data.options[0].value);
+    vent(interaction.member, config['vent-ch'], interaction.id, interaction.token, interaction.data.options[0].value);
   } else if (interaction.data.name == 'delete') {
     if (main[interaction.data.options[0].value - 1][2] == interaction.member.user.id) {
       deleteVent(interaction.id, interaction.token, interaction.data.options[0].value);
